@@ -8,12 +8,9 @@ const App = () => {
   const [showAll, setShowAll] = useState(true);
 
   const fetchNotes = () => {
-    return () => {
-      axios
-        .get('http://localhost:3001/notes')
-        .then(response => {
-          setNotes(response.data)
-        })
+    return async () => {
+      const response = await axios.get('http://localhost:3001/notes')
+      await setNotes(response.data)
     };
   }
 
@@ -21,11 +18,6 @@ const App = () => {
   useEffect(
     fetchNotes(), []
   )
-
-
-
-
-
 
 
   console.log('render', notes.length, 'notes: ', notes)
