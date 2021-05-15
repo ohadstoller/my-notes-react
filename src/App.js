@@ -7,15 +7,27 @@ const App = () => {
   const [newNote, setNewNote] = useState('a new note')
   const [showAll, setShowAll] = useState(true);
 
-  useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/notes')
-      .then(response => {
-        console.log('promise fulfilled')
-        setNotes(response.data)
-      })
-  }, [])
+  const fetchNotes = () => {
+    return () => {
+      axios
+        .get('http://localhost:3001/notes')
+        .then(response => {
+          setNotes(response.data)
+        })
+    };
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(
+    fetchNotes(), []
+  )
+
+
+
+
+
+
+
   console.log('render', notes.length, 'notes: ', notes)
 
   const addNote = (event) => {
@@ -36,7 +48,7 @@ const App = () => {
 
   const handleNoteChange = (event) => {
     const noteValue = event.target.value;
-    console.log(noteValue)
+    console.log('adding new note: ', noteValue)
     setNewNote(noteValue)
   }
 
