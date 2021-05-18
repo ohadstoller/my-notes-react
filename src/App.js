@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import Note from "./components/Note";
-import axios from "axios";
+import {createNoteRequest, getAllNotesRequest, updateNoteRequest} from "./services/noteService";
 
 
 const App = () => {
@@ -9,9 +9,8 @@ const App = () => {
   const [showAll, setShowAll] = useState(true);
 
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchNotes = async () => {
-    const response = await axios.get('http://localhost:3001/notes')
+    const response = await getAllNotesRequest();
     setNotes(response.data)
   };
 
@@ -34,23 +33,19 @@ const App = () => {
   const addNote = async (event) => {
     event.preventDefault()
     const noteObject = createNoteObject()
-    const {data} = await addNoteRequest(noteObject);
+    const {data} = await createNoteRequest(noteObject);
     await setNotes(notes.concat(data))
     await setNewNote('')
   }
 
-  const addNoteRequest = async (noteObject) => {
-    return await axios.post('http://localhost:3001/notes', noteObject)
-  }
 
   const isImportant = note => note.important;
   const notesToShow = showAll ? notes : notes.filter(isImportant)
 
   const toggleImportanceOf = async (id) => {
-    let url = `http://localhost:3001/notes/${id}`;
     const note = notes.find(note => note.id === id)
     const changedNote = {...note, important: !note.important}
-    const req = await axios.put(url, changedNote)
+    const req = await updateNoteRequest(id, changedNote)
     await setNotes(notes.map(note => note.id !== id ? note : req.data))
   }
 
