@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import Note from "./components/Note";
 import axios from "axios";
 
+
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('a new note')
@@ -18,27 +19,44 @@ const App = () => {
     fetchNotes, []
   )
 
+  const createNoteObject = () => {
+    return (
+      {
+        content: newNote,
+        date: new Date(),
+        important: Math.random() < 0.5,
+      }
 
-  const addNote = (event) => {
+    )
+  }
+
+
+  const addNote = async (event) => {
     event.preventDefault()
-    const noteObject = {
-      content: newNote,
-      date: new Date(),
-      important: Math.random() < 0.5,
-    }
-    axios.post('http://localhost:3001/notes', noteObject).then(response => {
-    })
-    setNotes(notes.concat(noteObject))
-    setNewNote('')
+    const noteObject = createNoteObject()
+    const {data} = await addNoteRequest(noteObject);
+    await setNotes(notes.concat(data))
+    await setNewNote('')
+  }
+
+  const addNoteRequest = async (noteObject) => {
+    return await axios.post('http://localhost:3001/notes', noteObject)
   }
 
   const isImportant = note => note.important;
   const notesToShow = showAll ? notes : notes.filter(isImportant)
 
+  const toggleImportanceOf = async (id) => {
+    let url = `http://localhost:3001/notes/${id}`;
+    const note = notes.find(note => note.id === id)
+    const changedNote = {...note, important: !note.important}
+    const req = await axios.put(url, changedNote)
+    await setNotes(notes.map(note => note.id !== id ? note : req.data))
+  }
+
 
   const handleNoteChange = (event) => {
     const noteValue = event.target.value;
-    console.log('adding new note: ', noteValue)
     setNewNote(noteValue)
   }
 
@@ -58,7 +76,9 @@ const App = () => {
       </div>
       <ul>
         {notesToShow.map(note =>
-          <Note key={note.id} note={note}/>
+          <Note key={note.id} note={note}
+                toggleImportance={() => toggleImportanceOf(note.id)}
+          />
         )}
       </ul>
     </div>
