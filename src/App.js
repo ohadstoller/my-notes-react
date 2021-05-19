@@ -5,17 +5,16 @@ import {createNoteRequest, getAllNotesRequest, updateNoteRequest} from "./servic
 
 const App = () => {
   const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState('a new note')
+  const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true);
 
 
-  const fetchNotes = async () => {
-    const response = await getAllNotesRequest();
-    setNotes(response.data)
-  };
 
-  useEffect(
-    fetchNotes, []
+  useEffect(async ()=> {
+    const notes = await getAllNotesRequest();
+    await setNotes(notes);
+    }
+    , []
   )
 
   const createNoteObject = () => {
@@ -33,8 +32,8 @@ const App = () => {
   const addNote = async (event) => {
     event.preventDefault()
     const noteObject = createNoteObject()
-    const {data} = await createNoteRequest(noteObject);
-    await setNotes(notes.concat(data))
+    const returnedNote = await createNoteRequest(noteObject);
+    await setNotes(notes.concat(returnedNote))
     await setNewNote('')
   }
 
@@ -45,8 +44,8 @@ const App = () => {
   const toggleImportanceOf = async (id) => {
     const note = notes.find(note => note.id === id)
     const changedNote = {...note, important: !note.important}
-    const req = await updateNoteRequest(id, changedNote)
-    await setNotes(notes.map(note => note.id !== id ? note : req.data))
+    const returnedNote = await updateNoteRequest(id, changedNote)
+    await setNotes(notes.map(note => note.id !== id ? note : returnedNote))
   }
 
 
