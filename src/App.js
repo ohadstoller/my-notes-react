@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import Note from "./components/Note";
 import Notification from './components/Notification'
+import Footer from './components/Footer'
 import {createNoteRequest, getAllNotesRequest, updateNoteRequest} from "./services/noteService";
 
 
@@ -89,6 +90,7 @@ const App = () => {
           />
         )}
       </ul>
+      <Footer/>
     </div>
   )
 }
